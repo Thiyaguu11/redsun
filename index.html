@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RedSon Game</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #000;
+      font-family: sans-serif;
+      user-select: none;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    #ui-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    #health-bar-container {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 250px;
+      height: 20px;
+      border: 2px solid white;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+    }
+
+    #health-bar-fill {
+      width: 100%;
+      height: 100%;
+      background-color: white;
+      transition: width 0.1s linear;
+    }
+
+    #start-popup {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(20, 0, 0, 0.9);
+      border: 2px solid #550000;
+      color: white;
+      padding: 30px;
+      text-align: center;
+      pointer-events: auto;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+      z-index: 10;
+      display: none;
+      /* Wait for intro video */
+    }
+
+    #main-menu-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(10, 5, 5, 0.95);
+      z-index: 50;
+      pointer-events: auto;
+    }
+
+    #main-menu-screen h1 {
+      font-size: 80px;
+      color: #ff3333;
+      text-transform: uppercase;
+      letter-spacing: 10px;
+      margin-bottom: 50px;
+      text-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+    }
+
+    #main-menu-screen button {
+      margin: 15px;
+      padding: 15px 40px;
+      font-size: 24px;
+      cursor: pointer;
+      background-color: transparent;
+      color: #ff8888;
+      border: 2px solid #ff4444;
+      font-weight: bold;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+      width: 300px;
+    }
+
+    #main-menu-screen button:hover {
+      background-color: #ff2222;
+      color: white;
+      box-shadow: 0 0 15px rgba(255, 34, 34, 0.6);
+      transform: scale(1.05);
+    }
+
+    #intro-video-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: black;
+      display: none;
+      z-index: 25;
+      pointer-events: auto;
+    }
+
+    #intro-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #death-video-container,
+    #victory-video-container,
+    #angel-realm-change-video-container,
+    #angels-fight-video-container,
+    #player-angel-died-video-container,
+    #player-defeat-angels-video-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: black;
+      display: none;
+      z-index: 20;
+    }
+
+    #death-video,
+    #victory-video,
+    #angel-realm-change-video,
+    #angels-fight-video,
+    #player-angel-died-video,
+    #player-defeat-angels-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #fullscreen-image-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: black;
+      display: none;
+      z-index: 25;
+    }
+
+    #fullscreen-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    #god-realm-popup {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(20, 20, 20, 0.9);
+      border: 2px solid #ffffaa;
+      color: white;
+      padding: 30px;
+      text-align: center;
+      pointer-events: auto;
+      box-shadow: 0 0 20px rgba(255, 255, 100, 0.3);
+      z-index: 10;
+      display: none;
+    }
+
+    #god-realm-popup h1 {
+      margin-top: 0;
+      color: #ffff44;
+    }
+
+    #god-realm-popup p {
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    #god-start-btn {
+      margin-top: 20px;
+      padding: 10px 30px;
+      font-size: 20px;
+      cursor: pointer;
+      background-color: #ffcc00;
+      color: black;
+      border: none;
+      font-weight: bold;
+    }
+
+    #god-start-btn:hover {
+      background-color: #ffee44;
+    }
+
+    #start-popup h1 {
+      margin-top: 0;
+      color: #ff4444;
+    }
+
+    #start-popup p {
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    #start-btn {
+      margin-top: 20px;
+      padding: 10px 30px;
+      font-size: 20px;
+      cursor: pointer;
+      background-color: #ff2222;
+      color: white;
+      border: none;
+      font-weight: bold;
+    }
+
+    #start-btn:hover {
+      background-color: #ff5555;
+    }
+
+    #finale-popup {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(20, 20, 20, 0.9);
+      border: 2px solid #ff4444;
+      color: white;
+      padding: 30px;
+      text-align: center;
+      pointer-events: auto;
+      box-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
+      z-index: 10;
+      display: none;
+      max-width: 600px;
+    }
+
+    #finale-popup h1 {
+      margin-top: 0;
+      color: #ff4444;
+    }
+
+    #finale-popup p {
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    #finale-start-btn {
+      margin-top: 20px;
+      padding: 10px 30px;
+      font-size: 20px;
+      cursor: pointer;
+      background-color: #ff2222;
+      color: white;
+      border: none;
+      font-weight: bold;
+    }
+
+    #finale-start-btn:hover {
+      background-color: #ff5555;
+    }
+
+    #ending-popup {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(10, 0, 0, 0.95);
+      border: 2px solid #550000;
+      color: white;
+      padding: 40px;
+      text-align: center;
+      pointer-events: auto;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+      z-index: 100;
+      display: none;
+      max-width: 800px;
+    }
+
+    #ending-popup p {
+      font-style: italic;
+      font-size: 24px;
+      text-shadow: 2px 2px 5px black;
+      line-height: 1.8;
+      color: #ffcccc;
+    }
+
+    #ending-okay-btn {
+      margin-top: 30px;
+      padding: 10px 40px;
+      font-size: 20px;
+      cursor: pointer;
+      background-color: transparent;
+      color: white;
+      border: 2px solid #ff4444;
+      font-weight: bold;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+    }
+
+    #ending-okay-btn:hover {
+      background-color: #ff2222;
+      box-shadow: 0 0 15px rgba(255, 34, 34, 0.6);
+      transform: scale(1.05);
+    }
+
+    #wave-survived-popup {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      /* Let clicks pass through */
+      z-index: 80;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+      text-align: center;
+      text-shadow: 2px 2px 5px black;
+      font-size: 48px;
+      color: #ffff00;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+  <div id="ui-layer">
+    <div id="main-menu-screen">
+      <h1>Red Sun</h1>
+      <button id="story-mode-btn">Story Mode</button>
+      <button id="local-mode-btn">Local Mode</button>
+    </div>
+
+    <div id="health-bar-container">
+      <div id="health-bar-fill"></div>
+    </div>
+
+    <div id="wave-survived-popup">
+      <div id="wave-survived-text">Survived Wave X</div>
+    </div>
+
+    <div id="intro-video-container">
+      <video id="intro-video" src="/Dark_realm_intro.mp4"></video>
+    </div>
+
+    <div id="start-popup">
+      <p><strong>WASD</strong> - For movements<br />
+        <strong>Left Click</strong> - Light Attack<br />
+        <strong>Right Click</strong> - Heavy Attack (5s Cooldown)
+      </p>
+      <button id="start-btn">Okay</button>
+    </div>
+
+    <div id="god-realm-popup">
+      <h1>God Realm</h1>
+      <p><strong>WASD</strong> - Move<br />
+        <strong>Space</strong> - Ascend (Release to Descend)<br />
+        <strong>Left Click</strong> - Light Beam (Auto-Lock)<br />
+        <strong>Right Click</strong> - Shield Bubble (5s Cooldown)
+      </p>
+      <button id="god-start-btn">Enter</button>
+    </div>
+
+    <div id="finale-popup">
+      <h1>The Finale</h1>
+      <p>You play as the dark warrior fighting alongside the mighty celestial guardian angel. The angel will guard you
+        while fighting. Wipe out the enemies!</p>
+      <p><strong>WASD</strong> - For movement<br />
+        <strong>Left Click</strong> - Light Attack<br />
+        <strong>Right Click</strong> - Heavy Attack (5s Cooldown)
+      </p>
+      <button id="finale-start-btn">Enter Battle</button>
+    </div>
+
+    <div id="death-video-container">
+      <video id="death-video" src="/player_died.mp4"></video>
+    </div>
+
+    <div id="victory-video-container">
+      <video id="victory-video" src="/dimension_opens.mp4"></video>
+    </div>
+
+    <div id="fullscreen-image-container">
+      <img id="fullscreen-image" src="" alt="Story Sequence" />
+    </div>
+
+    <audio id="intro-audio" src="/intro.mp3"></audio>
+
+    <div id="angel-realm-change-video-container">
+      <video id="angel-realm-change-video" src="/angel_realm_change.mp4"></video>
+    </div>
+
+    <div id="angels-fight-video-container">
+      <video id="angels-fight-video" src="/angels_fight.mp4"></video>
+    </div>
+
+    <div id="player-angel-died-video-container">
+      <video id="player-angel-died-video" src="/player_angel_died.mp4"></video>
+    </div>
+
+    <div id="player-defeat-angels-video-container">
+      <video id="player-defeat-angels-video" src="/player_defeat_angels.mp4"></video>
+    </div>
+
+    <!-- Finale Videos -->
+    <div id="angel-save-video-container"
+      style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:20; background:black; display:none;">
+      <video id="angel-save-video" src="/angel_to_the_save.mp4"
+        style="width:100%; height:100%; object-fit:cover;"></video>
+    </div>
+
+    <div id="syncup-fail-video-container"
+      style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:20; background:black; display:none;">
+      <video id="syncup-fail-video" src="/syncup_fail.mp4" style="width:100%; height:100%; object-fit:cover;"></video>
+    </div>
+
+    <div id="powerup-video-container"
+      style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:20; background:black; display:none;">
+      <video id="powerup-video" src="/powerup.mp4" style="width:100%; height:100%; object-fit:cover;"></video>
+    </div>
+
+    <div id="rampage-1-video-container"
+      style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:20; background:black; display:none;">
+      <video id="rampage-1-video" src="/before_rampage_1.mp4"
+        style="width:100%; height:100%; object-fit:cover;"></video>
+    </div>
+
+    <div id="rampage-2-video-container"
+      style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:20; background:black; display:none;">
+      <video id="rampage-2-video" src="/before_rampage_2.mp4"
+        style="width:100%; height:100%; object-fit:cover;"></video>
+    </div>
+
+    <div id="explosion-video-container"
+      style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:20; background:black; display:none;">
+      <video id="explosion-video" src="/explosion.mp4" style="width:100%; height:100%; object-fit:cover;"></video>
+    </div>
+
+    <div id="finale-video-container"
+      style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:20; background:black; display:none;">
+      <video id="finale-video" src="/finale.mp4" style="width:100%; height:100%; object-fit:cover;"></video>
+    </div>
+
+    <div id="powerdown-video-container"
+      style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:20; background:black; display:none;">
+      <video id="powerdown-video" src="/powerdown.mp4" style="width:100%; height:100%; object-fit:cover;"></video>
+    </div>
+
+    <div id="the-end-video-container"
+      style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:20; background:black; display:none;">
+      <video id="the-end-video" src="/The_end.mp4" style="width:100%; height:100%; object-fit:cover;"></video>
+    </div>
+
+    <div id="ending-popup">
+      <p>
+        "The realms would never forget the Red Sun.<br>
+        Because sometimes the greatest evil is not darkness…<br>
+        It is imbalance.<br>
+        And sometimes salvation does not come from purity.<br>
+        It comes from unlikely hands reaching across the divide."
+      </p>
+      <button id="ending-okay-btn">Okay</button>
+    </div>
+
+    <audio id="combat-audio" src="/croud_fighting.mp3" loop></audio>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>

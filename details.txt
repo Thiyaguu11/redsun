@@ -1,0 +1,145 @@
+✅ Fake the army
+You don’t need 300 real enemies.
+You need:
+10–15 real enemies (with AI)
+The rest are background silhouettes (no AI, just looping animation)
+Even farther enemies = animated sprites or shader silhouettes
+No logic = no lag.
+
+✅ Fake particles
+Instead of 1000 ember particles:
+Use 1 animated texture layer with scrolling noise.
+Add a screen-space overlay shader.
+Done.
+
+✅ Lighting trick
+Don’t use dynamic lights.
+Bake lighting.
+Use a strong red gradient skybox.
+Use rim light shader on characters.
+
+Looks cinematic.
+Costs almost nothing.
+
+
+
+after the angel goes throught the dimensional gate
+the stickman with red scarf and the celestial angel will have a conversation
+and the stickman and the angel fights together to defeat the red son and save the world
+but the angel will be injured by the red son and gives its power to the stickman
+and the stickman will become the angel and defeats the red son and save the world
+then the stickman will be given an option to give back the power or not
+
+if 
+    he chooses to give back the power then he will become the stickman again and the angel will go back to the heaven and the game will end
+else
+    he chooses not to give back the power then he kill the angel and the stickman will become the evil god and the game will end
+fi
+
+
+
+Long before the war…
+before the screams echoed through cloud and flame…
+there were two eternal realms.
+
+The Celestial Realm 
+The Dark Realm
+
+They were rivals.
+But they were balanced.
+That balance shattered on the Night of the Crimson Ascension.
+"Red sun"
+
+It began during a rare cosmic alignment known as The Convergence of Crowns — a moment that occurred once every ten thousand cycles, when the core energies of both realms synchronized across the void.
+
+The white celestial sun dimmed.
+And from behind it… something bled through.
+A second sun emerged.
+
+The Red Sun did not burn the flesh, It burned the mind.
+
+Those touched by its glow began to hear voices — promises of truth, betrayal, divine revelation. They saw enemies where there were none. They felt rage without cause.
+
+Wings turned against wings.
+Blades turned against brothers.
+Both realms fell into chaos.
+
+Not war.
+
+"Madness"
+
+
+In the Dark Realm, there was a warrior.
+
+He had no crown.
+No prophecy.
+No divine blessing.
+
+Just two blades and the will to endure.
+
+When his people began slaughtering one another under the Red Sun’s influence, he tried restraint.
+
+He tried reason.
+
+He failed.
+
+The infected could not be saved.
+
+So he made a choice no one else could make.
+
+He became the executioner.
+
+
+
+In the Celestial Realm, the corruption spread even faster.
+
+Beings of pure light, once serene, began firing beams of judgment at imagined traitors.
+
+Floating sanctuaries crumbled.
+
+Guardian angels turned on their own.
+
+One angel survived.
+
+Not because she was the strongest.
+
+But because when the madness reached her…
+
+she hesitated.
+
+She questioned the voice.
+
+She refused the whisper.
+
+And that doubt saved her mind.
+
+By the time clarity returned, she stood alone
+
+
+The warrior discovered a dimensional fracture — a tear between realms.
+The angel sensed the same tear from the heavens.
+
+They stepped through at the same time.
+
+Blade met wings.
+
+Dark met light.
+
+They should have been enemies.
+
+But neither attacked.
+
+Because neither had madness in their eyes.
+
+Only exhaustion.
+
+Only loss.
+
+And the same enemy hanging above them.
+
+
+The realms would never forget the Red Sun.
+Because sometimes the greatest evil is not darkness…
+It is imbalance.
+And sometimes salvation does not come from purity.
+It comes from unlikely hands reaching across the divide.
