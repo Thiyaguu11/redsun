@@ -35,15 +35,34 @@ export class FinaleGame {
 
     private playVideo(videoElement: HTMLVideoElement, containerElement: HTMLElement, onEndedCallback: () => void) {
         containerElement.style.display = 'block';
-        videoElement.play().catch(e => {
-            console.error("Video play error:", e);
+
+        let hasEnded = false;
+        const complete = () => {
+            if (hasEnded) return;
+            hasEnded = true;
             containerElement.style.display = 'none';
             onEndedCallback();
-        });
+        };
+
+        const playPromise = videoElement.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(e => {
+                console.error("Video play error:", e);
+                complete();
+            });
+        } else {
+            videoElement.play().catch(e => complete());
+        }
+
+        setTimeout(() => {
+            if (!hasEnded && videoElement.paused) {
+                console.error("Video autoplay was blocked or hung. Skipping.");
+                complete();
+            }
+        }, 2500);
 
         videoElement.onended = () => {
-            containerElement.style.display = 'none';
-            onEndedCallback();
+            complete();
         };
     }
 

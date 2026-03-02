@@ -169,15 +169,36 @@ class Game {
 
     private playVideo(videoElement: HTMLVideoElement, containerElement: HTMLElement, onEndedCallback: () => void) {
         containerElement.style.display = 'block';
-        videoElement.play().catch(e => {
-            console.error("Video play error:", e);
+
+        let hasEnded = false;
+        const complete = () => {
+            if (hasEnded) return;
+            hasEnded = true;
             containerElement.style.display = 'none';
             onEndedCallback();
-        });
+        };
+
+        const playPromise = videoElement.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(e => {
+                console.error("Video play error:", e);
+                complete();
+            });
+        } else {
+            videoElement.play().catch(e => complete());
+        }
+
+        // Failsafe: if video is still paused after 2.5 seconds, force skip.
+        // This prevents the black container from hanging forever on strict browsers.
+        setTimeout(() => {
+            if (!hasEnded && videoElement.paused) {
+                console.error("Video autoplay was blocked or hung. Skipping.");
+                complete();
+            }
+        }, 2500);
 
         videoElement.onended = () => {
-            containerElement.style.display = 'none';
-            onEndedCallback();
+            complete();
         };
     }
 
