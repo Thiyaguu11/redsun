@@ -27,6 +27,7 @@ export class LocalModeGame {
     public onDeath?: (waveReached: number) => void;
 
     // Visuals
+    private uiCooldownBar!: HTMLElement;
     private shakeTime: number = 0;
     private shakeIntensity: number = 0;
 
@@ -52,6 +53,23 @@ export class LocalModeGame {
         this.setupTerrain();
         this.setupPlayer();
         this.setupControls();
+
+        // Create Circular Cooldown Indicator
+        this.uiCooldownBar = document.createElement('div');
+        this.uiCooldownBar.style.position = 'absolute';
+        this.uiCooldownBar.style.width = '30px';
+        this.uiCooldownBar.style.height = '30px';
+        this.uiCooldownBar.style.transform = 'translate(-50%, -50%)';
+        this.uiCooldownBar.style.display = 'none';
+
+        this.uiCooldownBar.innerHTML = `
+            <svg width="30" height="30" viewBox="0 0 30 30" style="transform: rotate(-90deg);">
+                <circle cx="15" cy="15" r="12" fill="none" stroke="rgba(0,0,0,0.5)" stroke-width="4" />
+                <circle id="local-cd-circle-fill" cx="15" cy="15" r="12" fill="none" stroke="white" stroke-width="4" 
+                        stroke-dasharray="75.4" stroke-dashoffset="75.4" style="transition: stroke-dashoffset 0.1s linear, stroke 0.2s;" />
+            </svg>
+        `;
+        document.getElementById('ui-layer')?.appendChild(this.uiCooldownBar);
 
         window.addEventListener('resize', this.onWindowResize.bind(this));
 
@@ -264,7 +282,40 @@ export class LocalModeGame {
 
         // Animate Player
         this.player.updateAnimation(delta);
-        if (this.player.heavyCooldown > 0) this.player.heavyCooldown -= delta;
+
+        if (this.player.heavyCooldown > 0) {
+            this.player.heavyCooldown -= delta;
+
+            this.uiCooldownBar.style.display = 'block';
+            const cdPercent = 1.0 - (this.player.heavyCooldown / 5.0);
+
+            const circleFill = document.getElementById('local-cd-circle-fill');
+            if (circleFill) {
+                const offset = 75.4 - (75.4 * cdPercent);
+                circleFill.style.strokeDashoffset = offset.toString();
+                circleFill.style.stroke = cdPercent >= 0.98 ? '#00ff00' : 'white';
+            }
+
+            const vector = new THREE.Vector3();
+            vector.copy(this.player.mesh.position);
+            vector.y += 2.5; // Above head
+            vector.project(this.camera);
+
+            const x = (vector.x * .5 + .5) * window.innerWidth;
+            const y = (vector.y * -.5 + .5) * window.innerHeight;
+            this.uiCooldownBar.style.left = `${x}px`;
+            this.uiCooldownBar.style.top = `${y}px`;
+
+            if (this.player.heavyCooldown <= 0) {
+                setTimeout(() => {
+                    if (this.player.heavyCooldown <= 0) this.uiCooldownBar.style.display = 'none';
+                }, 500);
+            }
+        } else {
+            if (this.player.heavyCooldown <= -0.5) {
+                this.uiCooldownBar.style.display = 'none';
+            }
+        }
 
         let isMoving = false;
         if (!this.player.isDead) {
