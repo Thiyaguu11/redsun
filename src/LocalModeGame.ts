@@ -25,8 +25,8 @@ export class LocalModeGame {
     private totalEnemiesInWave: number = 0;
     private enemySpeedMultiplier: number = 1.0;
 
-    // Health Pickup
-    private healthPickupMesh: THREE.Mesh | null = null;
+    // Health Pickups
+    private healthPickupMeshes: THREE.Mesh[] = [];
 
     public onDeath?: (waveReached: number) => void;
 
@@ -218,29 +218,37 @@ export class LocalModeGame {
             this.enemySpeedMultiplier = 1.0 + ((this.currentWave - 5) * 0.05); // +5% speed per wave after 5
         }
 
-        // Spawn Health Pickup
-        if (!this.healthPickupMesh) {
+        // Spawn Health Pickups (1 base + 1 every 5 waves)
+        const targetCrystalCount = Math.floor((this.currentWave - 1) / 5) + 1;
+
+        // Clear existing uncollected crystals
+        for (const pickup of this.healthPickupMeshes) {
+            this.scene.remove(pickup);
+        }
+        this.healthPickupMeshes = [];
+
+        for (let i = 0; i < targetCrystalCount; i++) {
             const geo = new THREE.DodecahedronGeometry(0.8);
             const mat = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
-            this.healthPickupMesh = new THREE.Mesh(geo, mat);
+            const pickup = new THREE.Mesh(geo, mat);
 
-            // Add a solid core
             const coreGeo = new THREE.DodecahedronGeometry(0.4);
             const coreMat = new THREE.MeshBasicMaterial({ color: 0x88ff88 });
             const core = new THREE.Mesh(coreGeo, coreMat);
-            this.healthPickupMesh.add(core);
+            pickup.add(core);
 
-            this.scene.add(this.healthPickupMesh);
+            const pickupAngle = Math.random() * Math.PI * 2;
+            const pickupRadius = Math.random() * 15;
+            pickup.position.set(
+                Math.cos(pickupAngle) * pickupRadius,
+                1,
+                Math.sin(pickupAngle) * pickupRadius
+            );
+            pickup.visible = true;
+
+            this.scene.add(pickup);
+            this.healthPickupMeshes.push(pickup);
         }
-
-        const pickupAngle = Math.random() * Math.PI * 2;
-        const pickupRadius = Math.random() * 15;
-        this.healthPickupMesh.position.set(
-            Math.cos(pickupAngle) * pickupRadius,
-            1,
-            Math.sin(pickupAngle) * pickupRadius
-        );
-        this.healthPickupMesh.visible = true;
 
         // Batch spawn around the valley rim
         for (let i = 0; i < this.totalEnemiesInWave; i++) {
@@ -315,23 +323,26 @@ export class LocalModeGame {
             hpFill.style.backgroundColor = '#ffffff'; // White health bar as in story mode
         }
 
-        // Health Pickup Logic
-        if (this.healthPickupMesh && this.healthPickupMesh.visible) {
-            this.healthPickupMesh.rotation.y += delta;
-            this.healthPickupMesh.rotation.z += delta * 0.5;
+        // Health Pickups Logic
+        for (let i = this.healthPickupMeshes.length - 1; i >= 0; i--) {
+            const pickup = this.healthPickupMeshes[i];
+            if (pickup.visible) {
+                pickup.rotation.y += delta;
+                pickup.rotation.z += delta * 0.5;
 
-            // Bobbing effect
-            this.healthPickupMesh.position.y = 1 + Math.sin(Date.now() * 0.003) * 0.2;
+                // Bobbing effect, staggered by X position to look organic length-wise
+                pickup.position.y = 1 + Math.sin(Date.now() * 0.003 + pickup.position.x) * 0.2;
 
-            const distSq = this.player.mesh.position.distanceToSquared(this.healthPickupMesh.position);
-            if (distSq < 4.0) { // 2 units radius
-                this.player.hp = Math.min(100, this.player.hp + 50); // Heal 50%
-                this.healthPickupMesh.visible = false;
+                const distSq = this.player.mesh.position.distanceToSquared(pickup.position);
+                if (distSq < 4.0) { // 2 units radius
+                    this.player.hp = Math.min(100, this.player.hp + 50); // Heal 50%
+                    pickup.visible = false;
 
-                // Optional: Flash screen green briefly on pickup
-                const oldBg = this.scene.background;
-                this.scene.background = new THREE.Color(0x004400);
-                setTimeout(() => { this.scene.background = oldBg; }, 100);
+                    // Flash screen green briefly on pickup
+                    const oldBg = this.scene.background;
+                    this.scene.background = new THREE.Color(0x004400);
+                    setTimeout(() => { this.scene.background = oldBg; }, 100);
+                }
             }
         }
 
