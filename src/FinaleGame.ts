@@ -51,7 +51,7 @@ export class FinaleGame {
                 complete();
             });
         } else {
-            videoElement.play().catch(e => complete());
+            videoElement.play().catch(() => complete());
         }
 
         setTimeout(() => {

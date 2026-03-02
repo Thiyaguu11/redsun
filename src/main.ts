@@ -185,7 +185,7 @@ class Game {
                 complete();
             });
         } else {
-            videoElement.play().catch(e => complete());
+            videoElement.play().catch(() => complete());
         }
 
         // Failsafe: if video is still paused after 2.5 seconds, force skip.
